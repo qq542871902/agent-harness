@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "servers": [
+    {
+      "name": "local_example",
+      "enabled": false,
+      "command": "/absolute/path/to/mcp-server",
+      "args": ["--stdio"],
+      "working_directory": null,
+      "env_allowlist": ["HOME"]
+    }
+  ]
+}

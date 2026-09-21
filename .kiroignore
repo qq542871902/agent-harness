@@ -1,0 +1,83 @@
+# Kiro ignore file
+# 语法与 .gitignore 相同，命中的文件不会被 Kiro 索引 / 纳入上下文
+
+# ---------- 依赖与构建产物 ----------
+# Rust
+/target/
+**/target/
+Cargo.lock            # 库项目可忽略；二进制项目如需可删掉这行
+
+# Node
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+
+# Java / JVM
+*.class
+.gradle/
+*.jar
+*.war
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+
+# ---------- 环境变量与密钥 ----------
+.env
+.env.*
+*.pem
+*.key
+*.p12
+id_rsa*
+secrets*.json
+credentials*.json
+
+# ---------- 日志与临时文件 ----------
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.swp
+*.bak
+
+# ---------- 操作系统文件 ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- 编辑器 / IDE ----------
+.idea/
+.vscode/
+*.iml
+
+# ---------- 大型二进制 / 媒体文件（减少无用上下文） ----------
+*.pdf
+*.zip
+*.tar
+*.gz
+*.7z
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.mp4
+*.mov
+*.woff
+*.woff2
+*.ttf
+*.txt
+
+# ---------- 本项目特定（大量教程内容，按需保留/删除） ----------
+book/PDF/
+
+# ---------- 用于验证 .kiroignore 是否生效的测试文件 ----------
+a.txt
