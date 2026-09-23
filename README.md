@@ -17,7 +17,8 @@ agent-harness/
 ├── v6/                   # Persistent, resumable versioned sessions
 ├── v7/                   # Deterministic token-budgeted context management
 ├── v8/                   # Bounded MCP 2025-06-18 stdio tool adapter
-└── v9/                   # Same-process bounded role sub-agents
+├── v9/                   # Same-process bounded role sub-agents
+└── v10/                  # Controlled, cited workspace retrieval
 ```
 
 ## Stages
@@ -34,6 +35,7 @@ agent-harness/
 | [`v7/`](v7/README.md) | Context Management | V6 behavior plus request token budgets, coherent history compaction, deterministic summaries, Unicode-safe tool-output truncation | Exact provider tokenization, encrypted storage, arbitrary shell, OS-level isolation |
 | [`v8/`](v8/README.md) | Bounded MCP stdio | V7 behavior plus strict user-selected config, MCP 2025-06-18 lifecycle, paginated tool discovery, namespaced adapters, Ask policy, bounded process lifecycle | Full/future MCP, HTTP transport, server-initiated capabilities, MCP sandboxing |
 | [`v9/`](v9/README.md) | Same-process sub-agents | V8 behavior plus `spawn_agent`, role-filtered registry snapshots, shared runtime ports, bounded delegation, payload-free lineage tracing, schema-5 execution-journal resume | Recursive delegation, concurrent orchestration, separate child sessions/processes |
+| [`v10/`](v10/README.md) | Controlled workspace RAG | V9 runtime plus `search_workspace_knowledge`, local lexical retrieval, opt-in OpenAI-compatible vector/hybrid retrieval, in-memory cosine index, path/line citations, bounded scanning, and sensitive-path exclusion | Persistent vector database, entity-relation graph, LightRAG, child retrieval capability |
 
 ## Configure once
 
@@ -86,6 +88,11 @@ cargo run -p mini-harness-v8 -- run "Inspect the project with native tools."
 
 # V9: delegate bounded research/code/test tasks in the same harness runtime
 cargo run -p mini-harness-v9 -- run "Delegate repository research, then summarize it."
+
+# V10: local lexical retrieval by default; opt in to vector/hybrid RAG with embeddings
+cargo run -p mini-harness-v10 -- run "Find how DefaultPolicy restricts tool calls and cite the relevant code."
+RAG_MODE=hybrid EMBEDDING_MODEL=text-embedding-3-small \
+  cargo run -p mini-harness-v10 -- run "Find where tool-call authorization is enforced and cite it."
 ```
 
 V4 `run` may prompt on stdin before writes and selected shell commands. If stdin is unavailable or reaches EOF, the request is denied and returned to the model as a tool observation rather than hanging or executing silently. V5 preserves these decisions while recording each task under `traces/{session_id}.jsonl`; tool payloads are omitted so credentials are not persisted in traces. V6 additionally stores the complete resumable transcript under `.sessions/{session_id}.json`; this expected model/user/tool content is sensitive, while provider API keys are not part of the schema. V7 additionally derives a budgeted request view while retaining canonical session history, compacts only complete coherent message groups, records deterministic redacted summary metadata, and truncates native observations by Unicode characters before persistence. Its strict schema-2 loader clearly rejects older V6 sessions rather than migrating them implicitly. V8 adds an explicitly configured, bounded MCP 2025-06-18 stdio subset: discovered tools are namespaced into the shared registry and always require approval by default. MCP server processes run outside the native filesystem sandbox; see [`v8/README.md`](v8/README.md) before enabling one. V8 schema-3 sessions persist only non-secret tool identities and require current MCP configuration on resume. V9 adds approval-gated `spawn_agent` delegation to same-process child `AgentRunner`s that share the current LLM, context policy, approval/policy ports, trace, and role-filtered Arc-backed tool snapshots. Child state is in-memory, recursion is structurally absent, and schema 5 persists the non-secret sub-agent capability marker plus a durable in-flight side-effect journal so resume converts interrupted writes, shell calls, MCP calls, and delegations into indeterminate observations rather than silently replaying them. Child-internal trace events carry explicit child lineage. All later snapshots require HTTPS for provider credentials unless an explicit loopback-only local HTTP opt-in is configured; shell children receive a minimal non-secret environment, and model file tools exclude credential/session/trace paths. MCP protocol timeouts or desynchronization terminate and quarantine the configured server. Both harness-owned subtrees are reserved from `write_file`.

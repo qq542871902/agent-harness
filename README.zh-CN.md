@@ -17,7 +17,8 @@ agent-harness/
 ├── v6/                   # 可恢复的持久化版本化 Session
 ├── v7/                   # 确定性的 Token 预算 Context Management
 ├── v8/                   # 有边界的 MCP 2025-06-18 stdio 工具适配器
-└── v9/                   # 同进程、按角色受限的 Sub-Agent
+├── v9/                   # 同进程、按角色受限的 Sub-Agent
+└── v10/                  # 受控、可引用的 Workspace 检索工具
 ```
 
 ## 阶段
@@ -34,6 +35,7 @@ agent-harness/
 | [`v7/`](v7/README.zh-CN.md) | Context Management | V6 行为、请求 Token 预算、连贯历史压缩、确定性摘要、Unicode 安全工具输出截断 | 精确 Provider Tokenization、加密存储、任意 Shell、OS 级隔离 |
 | [`v8/`](v8/README.zh-CN.md) | Bounded MCP stdio | V7 行为、严格用户配置、MCP 2025-06-18 生命周期、分页发现、命名空间适配器、Ask Policy、有界进程生命周期 | 完整/未来 MCP、HTTP Transport、Server 发起能力、MCP 沙箱 |
 | [`v9/`](v9/README.zh-CN.md) | 同进程 Sub-Agent | V8 行为、`spawn_agent`、角色过滤 Registry 快照、共享 Runtime Port、有界委派、无载荷 lineage Trace、schema-5 execution journal resume | 递归委派、并发编排、独立 Child Session/进程 |
+| [`v10/`](v10/README.zh-CN.md) | 受控 Workspace RAG | V9 Runtime、`search_workspace_knowledge`、本地词法检索、显式启用的 OpenAI-compatible 向量/混合检索、内存余弦索引、路径/行号引用、有界扫描与敏感路径排除 | 持久化向量数据库、实体关系图、LightRAG、Child 检索能力 |
 
 ## 一次配置
 
@@ -81,6 +83,11 @@ MCP_CONFIG_PATH=/absolute/path/to/mcp.json \
 
 # V9：在同一个 Harness Runtime 内委派受限研究/编码/测试任务
 cargo run -p mini-harness-v9 -- run "委派仓库研究任务，然后概括结果。"
+
+# V10：默认使用本地词法检索；可显式启用 Embedding 向量/混合 RAG
+cargo run -p mini-harness-v10 -- run "查找 DefaultPolicy 如何限制工具调用，并引用相关代码。"
+RAG_MODE=hybrid EMBEDDING_MODEL=text-embedding-3-small \
+  cargo run -p mini-harness-v10 -- run "查找工具调用鉴权的实现并引用代码。"
 ```
 
 ## 重要安全边界

@@ -1324,6 +1324,26 @@ Sub-Agent 仍然运行于同一个 Harness Runtime。
 
 ---
 
+## V10 — Controlled Workspace RAG
+
+增加只读工具：
+
+```text
+search_workspace_knowledge
+```
+
+- 默认对受控 workspace 内的非敏感 UTF-8 文本执行有界、本地词法检索；
+- 可通过 `RAG_MODE=vector|hybrid` 显式启用 OpenAI-compatible Embedding、内存余弦向量检索及 RRF 词法/向量融合；
+- 结果必须附带相对路径、行范围、分数与截断片段，供 `read_file` 精读；
+- 不能遍历符号链接、`.env`、`.sessions/`、`traces/`、常见凭据路径、`.git/`、`target/` 或 `node_modules/`；
+- `lexical` 模式不依赖外部服务；`vector`/`hybrid` 会将有界 chunk、相对路径和查询发送给显式授权的 Embedding Provider；自定义 Embedding Endpoint 必须使用独立显式 Key；
+- 向量索引只缓存在进程内存中，源内容哈希变化时重建，不写入长期 Memory 或持久化向量数据库；
+- Tool Call 继续经过 Policy、Context、Trace 与 Session；Trace 不记录 query、chunk 或结果 payload。
+
+V10 不实现 LightRAG 的实体关系图或图检索；这些能力可在后续阶段继续扩展。
+
+---
+
 # 27. 最终架构目标
 
 ```text
